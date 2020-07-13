@@ -19,16 +19,18 @@ group = 'org.mokka88'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '14'
 
-def apiDir = "src-api"
-def apiPath = "$buildDir/generated/openapi"
-def basePackageName = "org.mokka88.msblueprint"
-def apiPackageName = "${basePackageName}.api"
+// This needs to be customized in each project
+def apiPackageName = "org.mokka88.msblueprint.auth.api"
+
+def apiSrcDir = "src-api"
+def apiRootPath = "$buildDir/generated/openapi"
+def apiPathSuffix = "$apiSrcDir/main/java/" + apiPackageName.replace('.', '/')
 
 sourceSets {
     main {
         java {
             srcDirs 'src/main/java'
-            srcDirs apiDir.toString() + "/main/java"
+            srcDirs apiSrcDir.toString() + "/main/java"
         }
     }
 }
@@ -60,26 +62,26 @@ apply plugin: 'org.openapi.generator'
 
 openApiGenerate {
     generatorName = "spring"
-    inputSpec = "$rootDir/src/main/resources/swagger-api.yml".toString()
-    outputDir = apiPath.toString()
+    inputSpec = "$rootDir/src/main/resources/openapi-def.yaml".toString()
+    outputDir = apiRootPath.toString()
 
     apiPackage = apiPackageName
-    // invokerPackage = "org.mokka88.msblueprint"
     modelPackage = "${apiPackageName}.model"
     configOptions = [
             dateLibrary    : "java8",
             delegatePattern: "true",
             inerfaceOnly   : "true",
-            sourceFolder   : "$apiDir/main/java"
+            sourceFolder   : "$apiSrcDir/main/java"
     ]
 }
 
 task generateApi {
     dependsOn 'openApiGenerate'
     doLast {
-        new File(rootDir.absolutePath, apiDir).deleteDir()
-        FileUtils.moveDirectory(new File("$apiPath/$apiDir/main/java/" + apiPackageName.replace('.', '/')), new File("${rootDir.absolutePath}/$apiDir/main/java/" + apiPackageName.replace('.', '/')))
-        // new File(apiPath).deleteDir()
+        new File(rootDir.absolutePath, apiSrcDir).deleteDir()
+        FileUtils.moveDirectory(new File("$apiRootPath/$apiPathSuffix"),
+                new File("${rootDir.absolutePath}/$apiPathSuffix"));
+        new File(apiRootPath).deleteDir()
     }
 }
 

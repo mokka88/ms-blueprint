@@ -1,0 +1,45 @@
+openapi: 3.0.0
+info:
+  description: Sample API for the micro-service blueprint project
+  version: 1.0.0
+  title: Bleuprint API
+  license:
+    name: MIT license
+    url: https://www.mit.edu/~amini/LICENSE.md
+tags:
+  - name: login
+    description: User login
+  - name: register
+    description: User registration
+  - name: user
+    description: Operations about user
+paths:
+  /login:
+    post:
+      tags:
+        - user
+        - login
+      summary: User login
+      description: ""
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLogin"
+        description: User login data
+        required: true
+      responses:
+        "405":
+          description: Login failed
+servers:
+  - url: /v1
+components:
+  schemas:
+    UserLogin:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
